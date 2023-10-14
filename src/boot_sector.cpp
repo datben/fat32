@@ -27,12 +27,12 @@ void BootSector::load(char *buffer) {
   jump_boot = read_bytes(buffer_viewer, 3);
   oem_name = read_bytes(buffer_viewer, 8);
   bytes_per_sector = BigEndian::read_short(buffer_viewer);
-  sectors_per_cluster = BigEndian::read_char(buffer_viewer);
+  sectors_per_cluster = read_char(buffer_viewer);
   reserved_sector_count = BigEndian::read_short(buffer_viewer);
-  table_count = BigEndian::read_char(buffer_viewer);
+  table_count = read_char(buffer_viewer);
   root_entry_count = BigEndian::read_short(buffer_viewer);
   total_sectors_16 = BigEndian::read_short(buffer_viewer);
-  media_type = BigEndian::read_char(buffer_viewer);
+  media_type = read_char(buffer_viewer);
   table_size_16 = BigEndian::read_short(buffer_viewer);
   sectors_per_track = BigEndian::read_short(buffer_viewer);
   head_side_count = BigEndian::read_short(buffer_viewer);
@@ -45,9 +45,9 @@ void BootSector::load(char *buffer) {
   fat_info = BigEndian::read_short(buffer_viewer);
   backup_boot_sector = BigEndian::read_short(buffer_viewer);
   reserved_0 = read_bytes(buffer_viewer, 12);
-  drive_number = BigEndian::read_char(buffer_viewer);
-  reserved_1 = BigEndian::read_char(buffer_viewer);
-  boot_signature = BigEndian::read_char(buffer_viewer);
+  drive_number = read_char(buffer_viewer);
+  reserved_1 = read_char(buffer_viewer);
+  boot_signature = read_char(buffer_viewer);
   volume_id = BigEndian::read_int(buffer_viewer);
   volume_label = read_bytes(buffer_viewer, 11);
 

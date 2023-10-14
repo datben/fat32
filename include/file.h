@@ -1,7 +1,9 @@
 #ifndef FILE_H
 #define FILE_H
 
-enum FileAttributes {
+#include <string>
+
+enum FileAttributes : char {
   READ_ONLY = 0x01,
   HIDDEN = 0x02,
   SYSTEM = 0x04,
@@ -12,24 +14,32 @@ enum FileAttributes {
   SHORT_FILE_NAME = 0x00
 };
 
+std::string get_file_attributes_string(FileAttributes attributes);
+
 class File {
 public:
   static const unsigned char BYTE_SIZE = 32;
 
-  char name[11];
+  char *name; // 11
   FileAttributes attributes;
-  unsigned char reserved;
-  unsigned char creation_time_tenths;
-  unsigned short creation_time;
-  unsigned short creation_date;
-  unsigned short last_access_date;
-  unsigned short first_cluster_high;
-  unsigned short last_write_time;
-  unsigned short last_write_date;
-  unsigned short first_cluster_low;
-  unsigned int file_size;
+  char reserved;
+  char creation_time_tenths;
+  short creation_time;
+  short creation_date;
+  short last_access_date;
+  short first_cluster_high;
+  short last_write_time;
+  short last_write_date;
+  short first_cluster_low;
+  int file_size;
 
   File(char *buffer);
+
+  void display();
+
+  bool is_directory();
+
+  int get_first_cluster();
 };
 
 #endif

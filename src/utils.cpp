@@ -28,6 +28,12 @@ char *read_bytes(char *&buffer, int size) {
   return bytes;
 }
 
+char read_char(char *&buffer) {
+  char value = buffer[0];
+  buffer += 1;
+  return value;
+}
+
 namespace BigEndian {
 
 int read_int(char *&buffer) {
@@ -44,12 +50,6 @@ short read_short(char *&buffer) {
     value |= buffer[i] << ((1 - i) * 8);
   }
   buffer += 2;
-  return value;
-}
-
-char read_char(char *&buffer) {
-  char value = buffer[0];
-  buffer += 1;
   return value;
 }
 

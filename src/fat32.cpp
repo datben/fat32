@@ -26,8 +26,10 @@ void Fat32::display() {
 }
 
 unsigned int Fat32::get_address(unsigned int index) {
-  unsigned int address = 0;
-  memcpy(&address, bytes + index * ADDRESS_BYTE_SIZE, ADDRESS_BYTE_SIZE);
+  char *bytes_tab = bytes;
+  char *&bytes_viewer = bytes_tab;
+  bytes_viewer += index * ADDRESS_BYTE_SIZE;
+  unsigned int address = (unsigned int)BigEndian::read_int(bytes_viewer);
   return address;
 }
 
@@ -57,4 +59,4 @@ unsigned int Fat32::FileAddressIndexIterator::next() {
   return index;
 }
 
-bool Fat32::FileAddressIndexIterator::has_next() { return current_address_index != 0xffffff0f; }
+bool Fat32::FileAddressIndexIterator::has_next() { return fat32->get_address(current_address_index) != 0xffffffff; }

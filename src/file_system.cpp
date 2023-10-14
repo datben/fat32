@@ -26,9 +26,7 @@ void FileSystem::reload_fat32() {
   fat32 = new Fat32(device, boot_sector);
 }
 char *FileSystem::get_data(int address_index) {
-
   int file_cluster_size = fat32->get_file_cluster_size(address_index);
-
   char *data = new char[file_cluster_size * boot_sector->bytes_per_cluster()];
   Fat32::FileAddressIndexIterator *iter = fat32->get_file_address_index_iterator(address_index);
   int i = 0;
