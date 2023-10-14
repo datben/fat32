@@ -1,4 +1,4 @@
-#include "./include/device.h"
+#include "../include/device.h"
 #include <iostream>
 #include <fstream>
 #include <string>

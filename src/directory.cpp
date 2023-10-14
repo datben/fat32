@@ -1,4 +1,4 @@
-#include "./include/directory.h"
+#include "../include/directory.h"
 #include <iostream>
 #include <fstream>
 #include <string>

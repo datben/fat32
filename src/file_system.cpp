@@ -11,10 +11,7 @@ void FileSystem::mount(char *path)
     device = new Device(path);
     is_mounted = true;
 
-    char *buffer = new char[BootSector::BYTE_SIZE];
-    device->read(buffer, BootSector::BYTE_SIZE, 0);
-    boot_sector = new BootSector(buffer);
-    delete buffer;
+    boot_sector = new BootSector(device);
 }
 
 void FileSystem::unmount()

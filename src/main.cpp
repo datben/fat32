@@ -1,18 +1,10 @@
-#include "../include/boot_sector.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-using namespace std;
+#include "../include/file_system.h"
 
 int main()
 {
-    std::ifstream myfile;
-    myfile.open("./data/SSD.data");
-    char *buffer = new char[90];
-    myfile.read(buffer, 90);
-    BootSector boot_sector(buffer);
-    delete buffer;
-    boot_sector.display();
-
+    FileSystem *file_system = new FileSystem();
+    file_system->mount((char *)"./data/SSD.data");
+    file_system->boot_sector->display();
+    file_system->unmount();
     return 0;
 }

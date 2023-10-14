@@ -36,9 +36,12 @@ public:
     char volume_label[11];
     char fs_type[8];
 
+    BootSector();
     BootSector(char *buffer);
+    BootSector(Device *device);
 
     void display();
+    void load(char *buffer);
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "../include/boot_sector.h"
 #include "../include/utils.h"
+#include "../include/device.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -9,6 +10,20 @@
 using namespace std;
 
 BootSector::BootSector(char *buffer)
+{
+    BootSector::load(buffer);
+};
+
+BootSector::BootSector(Device *device)
+{
+
+    char *buffer = new char[BootSector::BYTE_SIZE];
+    device->read(buffer, BootSector::BYTE_SIZE, 0);
+    BootSector::load(buffer);
+    delete buffer;
+};
+
+void BootSector::load(char *buffer)
 {
     memcpy(jump_boot, buffer, 3);
     memcpy(oem_name, buffer + 3, 8);
