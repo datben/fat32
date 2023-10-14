@@ -1,14 +1,37 @@
 #ifndef FAT32_H
 #define FAT32_H
 
+#include "boot_sector.h"
 #include "device.h"
 
 class Fat32 {
 public:
+  class FileAddressIndexIterator {
+  public:
+    Fat32 *fat32;
+    unsigned int current_address_index;
+
+    FileAddressIndexIterator(Fat32 *fat32, unsigned int current_address_index);
+
+    unsigned int next();
+    bool has_next();
+  };
+
+  static const unsigned char ADDRESS_BYTE_SIZE = 4;
+
   unsigned int fat_byte_size;
+  unsigned short bytes_per_sector;
+  unsigned char sectors_per_cluster;
   char *bytes;
 
   Fat32(Device *device, BootSector *boot_sector);
+  void reload(Device *device, BootSector *boot_sector);
+
+  unsigned int get_address(unsigned int index);
+
+  unsigned int get_file_cluster_size(unsigned int index);
+
+  FileAddressIndexIterator *get_file_address_index_iterator(unsigned int index);
 
   void display();
 };

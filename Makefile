@@ -11,7 +11,7 @@ SRC_FILES = main.cpp \
 	utils.cpp \
 	device.cpp \
 	file_system.cpp \
-	directory.cpp 
+	file.cpp 
 
 COMPILED_FILES = $(foreach item,$(SRC_FILES:.cpp=.o) ,target/build/src/$(item))
 

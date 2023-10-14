@@ -3,15 +3,14 @@
 
 #include <string>
 
-class Device
-{
+class Device {
 public:
-    std::string *path;
+  std::string *path;
 
-    Device(char *path);
+  Device(char *path);
 
-    void read(char *buffer, int size, int offset);
-    void write(char *buffer, int size, int offset);
+  void read(char *buffer, int size, int offset);
+  void write(char *buffer, int size, int offset);
 };
 
 #endif
