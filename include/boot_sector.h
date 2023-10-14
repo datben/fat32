@@ -1,6 +1,8 @@
 #ifndef BOOT_SECTOR_H
 #define BOOT_SECTOR_H
 
+#include "device.h"
+
 class BootSector
 {
 public:

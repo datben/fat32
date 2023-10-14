@@ -9,6 +9,9 @@ SRC_FILES = main.cpp \
 	fat32.cpp \
 	boot_sector.cpp \
 	utils.cpp \
+	device.cpp \
+	file_system.cpp \
+	directory.cpp 
 
 COMPILED_FILES = $(foreach item,$(SRC_FILES:.cpp=.o) ,target/build/src/$(item))
 
