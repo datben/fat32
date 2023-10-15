@@ -5,6 +5,8 @@
 #include "device.h"
 #include "fat32.h"
 
+#include <string>
+
 class FileSystem {
 public:
   Device *device;
@@ -20,15 +22,17 @@ public:
   void mount(char *path);
   void unmount();
 
-  void format(int bytes_per_sector, int sectors_per_cluster, int reserved_sector_count, int table_size_32);
-
-  char *get_data(int address_index);
+  char *get_file_data(int address_index);
 
   void create_directory(char *name);
 
-private:
+  void format(int bytes_per_sector, int sectors_per_cluster, int reserved_sector_count, int table_size_32);
+  int find_file(char *name);
+
   void reload_fat32();
   void update_fat32();
+
+  std::string ls();
 
   char *read_sector(int sector_index);
   char *read_cluster(int cluster_index);

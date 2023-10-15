@@ -68,6 +68,7 @@ int LittleEndian::read_int(char *&buffer) {
   buffer += 4;
   return value;
 }
+
 short LittleEndian::read_short(char *&buffer) {
   short value = 0;
   for (int i = 0; i < 2; i++) {

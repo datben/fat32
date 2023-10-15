@@ -1,6 +1,7 @@
 #ifndef FILE_H
 #define FILE_H
 
+#include "fat32.h"
 #include <string>
 
 enum FileAttributes : char {
@@ -44,6 +45,31 @@ public:
   bool is_directory();
 
   int get_first_cluster();
+};
+
+class DirectoryIterator {
+public:
+  int current_index;
+  char *buffer;
+  int size;
+
+  DirectoryIterator(char *buffer, int size);
+
+  File next();
+  bool has_next();
+};
+
+class FileClusterIterator {
+
+public:
+  Fat32::FileAddressIndexIterator *address_index_iter;
+  FileSystem *sys;
+
+  FileClusterIterator(FileSystem *sys, int current_cluster_index);
+
+  int current_cluster_index();
+  char *next();
+  bool has_next();
 };
 
 #endif

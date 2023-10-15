@@ -37,6 +37,13 @@ void Fat32::display() {
   print_hex(bytes, fat_byte_size, true);
 }
 
+void Fat32::set_address(unsigned int index, unsigned int value) {
+  char *bytes_tab = bytes;
+  char *&bytes_viewer = bytes_tab;
+  bytes_viewer += index * ADDRESS_BYTE_SIZE;
+  LittleEndian::write_int(bytes_viewer, value);
+}
+
 unsigned int Fat32::get_address(unsigned int index) {
   char *bytes_tab = bytes;
   char *&bytes_viewer = bytes_tab;

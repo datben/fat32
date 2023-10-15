@@ -11,7 +11,8 @@ SRC_FILES = main.cpp \
 	utils.cpp \
 	device.cpp \
 	file_system.cpp \
-	file.cpp 
+	file.cpp \
+	device_formater.cpp \
 
 COMPILED_FILES = $(foreach item,$(SRC_FILES:.cpp=.o) ,target/build/src/$(item))
 

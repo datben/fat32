@@ -1,4 +1,5 @@
 #include "../include/file_system.h"
+#include "../include/device_formater.h"
 #include "../include/file.h"
 #include "../include/utils.h"
 #include <cstring>
@@ -27,50 +28,12 @@ void FileSystem::format(int bytes_per_sector, int sectors_per_cluster, int reser
   delete fat32;
   delete boot_sector;
 
-  boot_sector = new BootSector();
-  boot_sector->bytes_per_sector = bytes_per_sector;
-  boot_sector->sectors_per_cluster = sectors_per_cluster;
-  boot_sector->reserved_sector_count = reserved_sector_count;
-  boot_sector->table_size_32 = table_size_32;
-  boot_sector->root_entry_count = 0;
-  boot_sector->fat_version = 0x0;
-  boot_sector->fs_type = (char *)"FAT32   ";
-  boot_sector->volume_label = (char *)"NO NAME    ";
-  boot_sector->volume_id = 0x0;
-  boot_sector->table_count = 0x1;
-  boot_sector->media_type = 0xF8;
-  boot_sector->fat_info = 0x0;
-  boot_sector->backup_boot_sector = 0x0;
-  boot_sector->drive_number = 0x80;
-  boot_sector->boot_signature = 0x29;
-  boot_sector->reserved_1 = 0x0;
-  boot_sector->reserved_0 = new char[12];
-  for (int i = 0; i < 12; i++) {
-    boot_sector->reserved_0[i] = 0x0;
-  }
-  boot_sector->extended_flags = 0x0;
-  boot_sector->root_cluster = 0x2;
-  boot_sector->total_sectors_32 = 0x0;
-  boot_sector->hidden_sector_count = 0x0;
-  boot_sector->head_side_count = 0x0;
-  boot_sector->sectors_per_track = 0x0;
-  boot_sector->table_size_16 = 0x0;
-  boot_sector->total_sectors_16 = 0x0;
-  boot_sector->oem_name = (char *)"MSWIN4.1";
-  boot_sector->jump_boot = new char[3];
-  boot_sector->jump_boot[0] = 0xEB;
-  boot_sector->jump_boot[1] = 0x58;
-  boot_sector->jump_boot[2] = 0x90;
+  DeviceFormater::format(this, device, bytes_per_sector, sectors_per_cluster, reserved_sector_count, table_size_32);
 
-  char *bs_data = boot_sector->serialize();
-  device->write(bs_data, BootSector::BYTE_SIZE, 0);
-  delete bs_data;
-
-  char *fat32_data = Fat32::format_new_fat32(bytes_per_sector, table_size_32);
-  device->write(fat32_data, bytes_per_sector * table_size_32, reserved_sector_count * bytes_per_sector);
-  delete fat32_data;
-
+  current_file_index = boot_sector->root_cluster;
+  boot_sector = new BootSector(device);
   fat32 = new Fat32(device, boot_sector);
+
   is_mounted = true;
 }
 
@@ -84,7 +47,7 @@ void FileSystem::update_fat32() {
                 boot_sector->reserved_sector_count * boot_sector->bytes_per_sector);
 }
 
-char *FileSystem::get_data(int address_index) {
+char *FileSystem::get_file_data(int address_index) {
   int file_cluster_size = fat32->get_file_cluster_size(address_index);
   char *data = new char[file_cluster_size * boot_sector->bytes_per_cluster()];
   Fat32::FileAddressIndexIterator *iter = fat32->get_file_address_index_iterator(address_index);
@@ -99,6 +62,21 @@ char *FileSystem::get_data(int address_index) {
   }
   delete iter;
   return data;
+}
+
+string FileSystem::ls() {
+  char *dir_data = get_file_data(current_file_index);
+  int data_size = fat32->get_file_cluster_size(current_file_index) * boot_sector->bytes_per_cluster();
+  DirectoryIterator *iter = new DirectoryIterator(dir_data, data_size);
+  string result = "";
+  while (iter->has_next()) {
+    File file = iter->next();
+    result.append(file.name, 11);
+    result += "\n";
+  }
+  delete iter;
+  delete[] dir_data;
+  return result;
 }
 
 char *FileSystem::read_sector(int sector_index) {
@@ -123,27 +101,43 @@ void FileSystem::write_cluster(char *buffer, int cluster_index) {
                 boot_sector->data_offset() + cluster_index * boot_sector->bytes_per_cluster());
 }
 
+int FileSystem::find_file(char *name) {
+  char *dir_data = get_file_data(current_file_index);
+  int data_size = fat32->get_file_cluster_size(current_file_index) * boot_sector->bytes_per_cluster();
+  DirectoryIterator *iter = new DirectoryIterator(dir_data, data_size);
+  int result = -1;
+  while (iter->has_next()) {
+    File file = iter->next();
+    if (strcmp(file.name, name) == 0) {
+      result = file.get_first_cluster();
+      break;
+    }
+  }
+  delete iter;
+  delete[] dir_data;
+  return result;
+}
+
 void FileSystem::create_directory(char *name) {
   int file_cluster_size = 1;
   int file_size = file_cluster_size * boot_sector->bytes_per_cluster();
-  int file_address_index = fat32->get_next_free_cluster();
-  int file_cluster_index = file_address_index;
+  int dir_address_index = fat32->get_next_free_cluster();
 
   File dir = File();
-  dir.name = name;
+  dir.name = (char *)".          ";
   dir.attributes = DIRECTORY;
   dir.reserved = 0x0;
   dir.creation_time = 0x0;
   dir.creation_date = 0x0;
   dir.last_access_date = 0x0;
-  dir.first_cluster_high = file_address_index >> 16;
+  dir.first_cluster_high = dir_address_index >> 16;
   dir.last_write_time = 0x0;
   dir.last_write_date = 0x0;
-  dir.first_cluster_low = file_address_index & 0xFFFF;
+  dir.first_cluster_low = dir_address_index & 0xFFFF;
   dir.file_size = file_size;
 
   File parent_dir = File();
-  parent_dir.name = (char *)"..";
+  parent_dir.name = (char *)"..         ";
   parent_dir.attributes = DIRECTORY;
   parent_dir.reserved = 0x0;
   parent_dir.creation_time = 0x0;
@@ -157,4 +151,31 @@ void FileSystem::create_directory(char *name) {
 
   char *dir_data = dir.serialize();
   char *parent_dir_data = parent_dir.serialize();
+
+  char *data = new char[boot_sector->bytes_per_cluster()]();
+  memcpy(data, dir_data, File::BYTE_SIZE);
+  memcpy(data + File::BYTE_SIZE, parent_dir_data, File::BYTE_SIZE);
+
+  write_cluster(data, dir_address_index);
+
+  fat32->set_address(dir_address_index, 0x0fffffff);
+
+  dir.name = name;
+  dir_data = dir.serialize();
+
+  char *current_dir_data = get_file_data(current_file_index);
+  int data_size = fat32->get_file_cluster_size(current_file_index) * boot_sector->bytes_per_cluster();
+  DirectoryIterator *iter = new DirectoryIterator(current_dir_data, data_size);
+  int i = 0;
+  while (iter->has_next()) {
+    iter->next();
+    i++;
+  }
+  // todo add file to current dir
+
+  delete iter;
+
+  delete[] current_dir_data;
+  delete[] dir_data;
+  delete[] parent_dir_data;
 }

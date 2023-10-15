@@ -10,6 +10,7 @@ public:
 
   class FileAddressIndexIterator {
   public:
+    unsigned int current_address_index;
     FileAddressIndexIterator(Fat32 *fat32, unsigned int current_address_index);
 
     unsigned int next();
@@ -17,8 +18,7 @@ public:
 
   private:
     Fat32 *fat32;
-    unsigned int current_address_index;
-  };
+    };
 
   static const unsigned char ADDRESS_BYTE_SIZE = 4;
 
@@ -34,6 +34,8 @@ public:
   unsigned int get_file_cluster_size(unsigned int index);
 
   unsigned int get_next_free_cluster();
+
+  void set_address(unsigned int index, unsigned int value);
 
   FileAddressIndexIterator *get_file_address_index_iterator(unsigned int index);
 

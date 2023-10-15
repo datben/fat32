@@ -1,4 +1,5 @@
 #include "../include/file.h"
+#include "../include/file_system.h"
 #include "../include/utils.h"
 #include <cstring>
 #include <iostream>
@@ -93,3 +94,34 @@ string get_file_attributes_string(FileAttributes attributes) {
   }
   return result;
 }
+
+DirectoryIterator::DirectoryIterator(char *buffer, int size) {
+  current_index = 0;
+  this->size = size;
+  this->buffer = buffer;
+}
+
+File DirectoryIterator::next() {
+  char *file_buffer = new char[File::BYTE_SIZE];
+  memcpy(file_buffer, buffer + current_index * File::BYTE_SIZE, File::BYTE_SIZE);
+  current_index++;
+  return File(file_buffer);
+}
+
+bool DirectoryIterator::has_next() {
+  return current_index * File::BYTE_SIZE < size && buffer[current_index * File::BYTE_SIZE] != 0;
+}
+
+FileClusterIterator::FileClusterIterator(FileSystem *sys, int current_cluster_index) {
+  this->address_index_iter = sys->fat32->get_file_address_index_iterator(current_cluster_index);
+  this->sys = sys;
+}
+
+int FileClusterIterator::current_cluster_index() { return address_index_iter->current_address_index; }
+
+char *FileClusterIterator::next() {
+  int cluster_index = address_index_iter->next();
+  return sys->read_cluster(cluster_index);
+}
+
+bool FileClusterIterator::has_next() { return address_index_iter->has_next(); }
