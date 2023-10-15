@@ -31,8 +31,9 @@ public:
   void reload(Device *device, BootSector *boot_sector);
 
   unsigned int get_address(unsigned int index);
-
   unsigned int get_file_cluster_size(unsigned int index);
+
+  unsigned int get_next_free_cluster();
 
   FileAddressIndexIterator *get_file_address_index_iterator(unsigned int index);
 

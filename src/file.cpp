@@ -4,6 +4,8 @@
 #include <iostream>
 using namespace std;
 
+File::File(){};
+
 File::File(char *buffer) {
   char *&buffer_viewer = buffer;
   name = read_bytes(buffer_viewer, 11);
@@ -41,6 +43,25 @@ void File::display() {
 bool File::is_directory() { return attributes == DIRECTORY; }
 
 int File::get_first_cluster() { return first_cluster_low | (first_cluster_high << 16); }
+
+char *File::serialize() {
+  char *buffer = new char[File::BYTE_SIZE];
+  char *ref = buffer;
+  char *&buffer_viewer = ref;
+  write_bytes(buffer_viewer, name, 11);
+  write_char(buffer_viewer, attributes);
+  write_char(buffer_viewer, reserved);
+  write_char(buffer_viewer, creation_time_tenths);
+  LittleEndian::write_short(buffer_viewer, creation_time);
+  LittleEndian::write_short(buffer_viewer, creation_date);
+  LittleEndian::write_short(buffer_viewer, last_access_date);
+  LittleEndian::write_short(buffer_viewer, first_cluster_high);
+  LittleEndian::write_short(buffer_viewer, last_write_time);
+  LittleEndian::write_short(buffer_viewer, last_write_date);
+  LittleEndian::write_short(buffer_viewer, first_cluster_low);
+  LittleEndian::write_int(buffer_viewer, file_size);
+  return buffer;
+}
 
 string get_file_attributes_string(FileAttributes attributes) {
   string result = "";

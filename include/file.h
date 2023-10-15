@@ -33,7 +33,11 @@ public:
   short first_cluster_low;
   int file_size;
 
+  File();
+
   File(char *buffer);
+
+  char *serialize();
 
   void display();
 

@@ -1,4 +1,5 @@
 #include "../include/file_system.h"
+#include "../include/file.h"
 #include "../include/utils.h"
 #include <cstring>
 #include <iostream>
@@ -78,6 +79,11 @@ void FileSystem::reload_fat32() {
   fat32 = new Fat32(device, boot_sector);
 }
 
+void FileSystem::update_fat32() {
+  device->write(fat32->bytes, boot_sector->bytes_per_sector * boot_sector->table_size_32,
+                boot_sector->reserved_sector_count * boot_sector->bytes_per_sector);
+}
+
 char *FileSystem::get_data(int address_index) {
   int file_cluster_size = fat32->get_file_cluster_size(address_index);
   char *data = new char[file_cluster_size * boot_sector->bytes_per_cluster()];
@@ -106,4 +112,49 @@ char *FileSystem::read_cluster(int cluster_index) {
   device->read(bytes, boot_sector->bytes_per_cluster(),
                boot_sector->data_offset() + cluster_index * boot_sector->bytes_per_cluster());
   return bytes;
+}
+
+void FileSystem::write_sector(char *buffer, int sector_index) {
+  device->write(buffer, boot_sector->bytes_per_sector, sector_index * boot_sector->bytes_per_sector);
+}
+
+void FileSystem::write_cluster(char *buffer, int cluster_index) {
+  device->write(buffer, boot_sector->bytes_per_cluster(),
+                boot_sector->data_offset() + cluster_index * boot_sector->bytes_per_cluster());
+}
+
+void FileSystem::create_directory(char *name) {
+  int file_cluster_size = 1;
+  int file_size = file_cluster_size * boot_sector->bytes_per_cluster();
+  int file_address_index = fat32->get_next_free_cluster();
+  int file_cluster_index = file_address_index;
+
+  File dir = File();
+  dir.name = name;
+  dir.attributes = DIRECTORY;
+  dir.reserved = 0x0;
+  dir.creation_time = 0x0;
+  dir.creation_date = 0x0;
+  dir.last_access_date = 0x0;
+  dir.first_cluster_high = file_address_index >> 16;
+  dir.last_write_time = 0x0;
+  dir.last_write_date = 0x0;
+  dir.first_cluster_low = file_address_index & 0xFFFF;
+  dir.file_size = file_size;
+
+  File parent_dir = File();
+  parent_dir.name = (char *)"..";
+  parent_dir.attributes = DIRECTORY;
+  parent_dir.reserved = 0x0;
+  parent_dir.creation_time = 0x0;
+  parent_dir.creation_date = 0x0;
+  parent_dir.last_access_date = 0x0;
+  parent_dir.first_cluster_high = current_file_index >> 16;
+  parent_dir.last_write_time = 0x0;
+  parent_dir.last_write_date = 0x0;
+  parent_dir.first_cluster_low = current_file_index & 0xFFFF;
+  parent_dir.file_size = 0x0;
+
+  char *dir_data = dir.serialize();
+  char *parent_dir_data = parent_dir.serialize();
 }

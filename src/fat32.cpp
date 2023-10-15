@@ -56,6 +56,14 @@ unsigned int Fat32::get_file_cluster_size(unsigned int index) {
   return cluster_size;
 }
 
+unsigned int Fat32::get_next_free_cluster() {
+  unsigned int index = 2;
+  while (get_address(index) != 0x0) {
+    index++;
+  }
+  return index;
+}
+
 Fat32::FileAddressIndexIterator *Fat32::get_file_address_index_iterator(unsigned int index) {
   return new FileAddressIndexIterator(this, index);
 }
