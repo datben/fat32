@@ -18,6 +18,7 @@ public:
   FileSystem();
   char *get_data(int address_index);
   void mount(char *path);
+  void format(int bytes_per_sector, int sectors_per_cluster, int reserved_sector_count, int table_size_32);
   void unmount();
 
 private:

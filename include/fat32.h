@@ -6,15 +6,18 @@
 
 class Fat32 {
 public:
+  static char *format_new_fat32(int bytes_per_sector, int table_size_32);
+
   class FileAddressIndexIterator {
   public:
-    Fat32 *fat32;
-    unsigned int current_address_index;
-
     FileAddressIndexIterator(Fat32 *fat32, unsigned int current_address_index);
 
     unsigned int next();
     bool has_next();
+
+  private:
+    Fat32 *fat32;
+    unsigned int current_address_index;
   };
 
   static const unsigned char ADDRESS_BYTE_SIZE = 4;

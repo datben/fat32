@@ -11,6 +11,8 @@
 #include "../include/utils.h"
 using namespace std;
 
+BootSector::BootSector(){};
+
 BootSector::BootSector(char *buffer) { BootSector::load(buffer); };
 
 BootSector::BootSector(Device *device) {
@@ -22,36 +24,68 @@ BootSector::BootSector(Device *device) {
 };
 
 void BootSector::load(char *buffer) {
-
   char *&buffer_viewer = buffer;
   jump_boot = read_bytes(buffer_viewer, 3);
   oem_name = read_bytes(buffer_viewer, 8);
-  bytes_per_sector = BigEndian::read_short(buffer_viewer);
+  bytes_per_sector = LittleEndian::read_short(buffer_viewer);
   sectors_per_cluster = read_char(buffer_viewer);
-  reserved_sector_count = BigEndian::read_short(buffer_viewer);
+  reserved_sector_count = LittleEndian::read_short(buffer_viewer);
   table_count = read_char(buffer_viewer);
-  root_entry_count = BigEndian::read_short(buffer_viewer);
-  total_sectors_16 = BigEndian::read_short(buffer_viewer);
+  root_entry_count = LittleEndian::read_short(buffer_viewer);
+  total_sectors_16 = LittleEndian::read_short(buffer_viewer);
   media_type = read_char(buffer_viewer);
-  table_size_16 = BigEndian::read_short(buffer_viewer);
-  sectors_per_track = BigEndian::read_short(buffer_viewer);
-  head_side_count = BigEndian::read_short(buffer_viewer);
-  hidden_sector_count = BigEndian::read_int(buffer_viewer);
-  total_sectors_32 = BigEndian::read_int(buffer_viewer);
-  table_size_32 = BigEndian::read_int(buffer_viewer);
-  extended_flags = BigEndian::read_short(buffer_viewer);
-  fat_version = BigEndian::read_short(buffer_viewer);
-  root_cluster = BigEndian::read_int(buffer_viewer);
-  fat_info = BigEndian::read_short(buffer_viewer);
-  backup_boot_sector = BigEndian::read_short(buffer_viewer);
+  table_size_16 = LittleEndian::read_short(buffer_viewer);
+  sectors_per_track = LittleEndian::read_short(buffer_viewer);
+  head_side_count = LittleEndian::read_short(buffer_viewer);
+  hidden_sector_count = LittleEndian::read_int(buffer_viewer);
+  total_sectors_32 = LittleEndian::read_int(buffer_viewer);
+  table_size_32 = LittleEndian::read_int(buffer_viewer);
+  extended_flags = LittleEndian::read_short(buffer_viewer);
+  fat_version = LittleEndian::read_short(buffer_viewer);
+  root_cluster = LittleEndian::read_int(buffer_viewer);
+  fat_info = LittleEndian::read_short(buffer_viewer);
+  backup_boot_sector = LittleEndian::read_short(buffer_viewer);
   reserved_0 = read_bytes(buffer_viewer, 12);
   drive_number = read_char(buffer_viewer);
   reserved_1 = read_char(buffer_viewer);
   boot_signature = read_char(buffer_viewer);
-  volume_id = BigEndian::read_int(buffer_viewer);
+  volume_id = LittleEndian::read_int(buffer_viewer);
   volume_label = read_bytes(buffer_viewer, 11);
-
   fs_type = read_bytes(buffer_viewer, 8);
+}
+
+char *BootSector::serialize() {
+  char *buffer = new char[BootSector::BYTE_SIZE];
+  char *ref = buffer;
+  char *&buffer_viewer = ref;
+  write_bytes(buffer_viewer, jump_boot, 3);
+  write_bytes(buffer_viewer, oem_name, 8);
+  LittleEndian::write_short(buffer_viewer, bytes_per_sector);
+  write_char(buffer_viewer, sectors_per_cluster);
+  LittleEndian::write_short(buffer_viewer, reserved_sector_count);
+  write_char(buffer_viewer, table_count);
+  LittleEndian::write_short(buffer_viewer, root_entry_count);
+  LittleEndian::write_short(buffer_viewer, total_sectors_16);
+  write_char(buffer_viewer, media_type);
+  LittleEndian::write_short(buffer_viewer, table_size_16);
+  LittleEndian::write_short(buffer_viewer, sectors_per_track);
+  LittleEndian::write_short(buffer_viewer, head_side_count);
+  LittleEndian::write_int(buffer_viewer, hidden_sector_count);
+  LittleEndian::write_int(buffer_viewer, total_sectors_32);
+  LittleEndian::write_int(buffer_viewer, table_size_32);
+  LittleEndian::write_short(buffer_viewer, extended_flags);
+  LittleEndian::write_short(buffer_viewer, fat_version);
+  LittleEndian::write_int(buffer_viewer, root_cluster);
+  LittleEndian::write_short(buffer_viewer, fat_info);
+  LittleEndian::write_short(buffer_viewer, backup_boot_sector);
+  write_bytes(buffer_viewer, reserved_0, 12);
+  write_char(buffer_viewer, drive_number);
+  write_char(buffer_viewer, reserved_1);
+  write_char(buffer_viewer, boot_signature);
+  LittleEndian::write_int(buffer_viewer, volume_id);
+  write_bytes(buffer_viewer, volume_label, 11);
+  write_bytes(buffer_viewer, fs_type, 8);
+  return buffer;
 }
 
 void BootSector::display() {

@@ -3,10 +3,22 @@
 #include "../include/utils.h"
 #include <cstring>
 #include <iostream>
-
 #include <stdio.h>
 
 using namespace std;
+
+char *Fat32::format_new_fat32(int bytes_per_sector, int table_size_32) {
+  char *bytes = new char[bytes_per_sector * table_size_32];
+  for (int i = 0; i < bytes_per_sector * table_size_32; i++) {
+    bytes[i] = 0x0;
+  }
+  char *ref = bytes;
+  char *&bytes_viewer = ref;
+  LittleEndian::write_int(bytes_viewer, 0xf0fffff0);
+  LittleEndian::write_int(bytes_viewer, 0x0fffffff);
+  LittleEndian::write_int(bytes_viewer, 0x0fffffff);
+  return bytes;
+}
 
 Fat32::Fat32(Device *device, BootSector *boot_sector) {
   fat_byte_size = boot_sector->bytes_per_sector * boot_sector->table_size_32;
@@ -21,7 +33,7 @@ void Fat32::reload(Device *device, BootSector *boot_sector) {
 }
 
 void Fat32::display() {
-  cout << "FAT32" << endl;
+  cout << "FAT32 : " << endl;
   print_hex(bytes, fat_byte_size, true);
 }
 
@@ -29,7 +41,7 @@ unsigned int Fat32::get_address(unsigned int index) {
   char *bytes_tab = bytes;
   char *&bytes_viewer = bytes_tab;
   bytes_viewer += index * ADDRESS_BYTE_SIZE;
-  unsigned int address = (unsigned int)BigEndian::read_int(bytes_viewer);
+  unsigned int address = (unsigned int)LittleEndian::read_int(bytes_viewer);
   return address;
 }
 
@@ -59,4 +71,4 @@ unsigned int Fat32::FileAddressIndexIterator::next() {
   return index;
 }
 
-bool Fat32::FileAddressIndexIterator::has_next() { return fat32->get_address(current_address_index) != 0xffffffff; }
+bool Fat32::FileAddressIndexIterator::has_next() { return current_address_index != 0xffffffff; }

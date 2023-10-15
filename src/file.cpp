@@ -10,14 +10,14 @@ File::File(char *buffer) {
   attributes = static_cast<FileAttributes>(read_char(buffer_viewer));
   reserved = read_char(buffer_viewer);
   creation_time_tenths = read_char(buffer_viewer);
-  creation_time = BigEndian::read_short(buffer_viewer);
-  creation_date = BigEndian::read_short(buffer_viewer);
-  last_access_date = BigEndian::read_short(buffer_viewer);
-  first_cluster_high = BigEndian::read_short(buffer_viewer);
-  last_write_time = BigEndian::read_short(buffer_viewer);
-  last_write_date = BigEndian::read_short(buffer_viewer);
-  first_cluster_low = BigEndian::read_short(buffer_viewer);
-  file_size = BigEndian::read_int(buffer_viewer);
+  creation_time = LittleEndian::read_short(buffer_viewer);
+  creation_date = LittleEndian::read_short(buffer_viewer);
+  last_access_date = LittleEndian::read_short(buffer_viewer);
+  first_cluster_high = LittleEndian::read_short(buffer_viewer);
+  last_write_time = LittleEndian::read_short(buffer_viewer);
+  last_write_date = LittleEndian::read_short(buffer_viewer);
+  first_cluster_low = LittleEndian::read_short(buffer_viewer);
+  file_size = LittleEndian::read_int(buffer_viewer);
 };
 
 void File::display() {

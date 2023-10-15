@@ -34,23 +34,45 @@ char read_char(char *&buffer) {
   return value;
 }
 
-namespace BigEndian {
+void write_char(char *&buffer, char value) {
+  buffer[0] = value;
+  buffer += 1;
+}
 
-int read_int(char *&buffer) {
+void write_bytes(char *&buffer, char *value, int size) {
+  for (int i = 0; i < size; i++) {
+    buffer[i] = value[i];
+  }
+  buffer += size;
+}
+
+void LittleEndian::write_int(char *&buffer, int value) {
+  for (int i = 0; i < 4; i++) {
+    buffer[i] = (value >> (i * 8)) & 0xff;
+  }
+  buffer += 4;
+}
+
+void LittleEndian::write_short(char *&buffer, short value) {
+  for (int i = 0; i < 2; i++) {
+    buffer[i] = (value >> (i * 8)) & 0xff;
+  }
+  buffer += 2;
+}
+
+int LittleEndian::read_int(char *&buffer) {
   int value = 0;
   for (int i = 0; i < 4; i++) {
-    value |= buffer[i] << ((3 - i) * 8);
+    value |= buffer[i] << (i * 8);
   }
   buffer += 4;
   return value;
 }
-short read_short(char *&buffer) {
+short LittleEndian::read_short(char *&buffer) {
   short value = 0;
   for (int i = 0; i < 2; i++) {
-    value |= buffer[i] << ((1 - i) * 8);
+    value |= buffer[i] << (i * 8);
   }
   buffer += 2;
   return value;
 }
-
-} // namespace BigEndian

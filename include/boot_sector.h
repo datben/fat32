@@ -39,6 +39,7 @@ public:
   BootSector(char *buffer);
   BootSector(Device *device);
 
+  char *serialize();
   void display();
   void load(char *buffer);
   unsigned int data_offset();
