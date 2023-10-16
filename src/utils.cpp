@@ -1,7 +1,10 @@
 #include "../include/utils.h"
 #include <stdio.h>
 
+#include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -95,4 +98,16 @@ short LittleEndian::read_short(char *&buffer) {
   }
   buffer += 2;
   return value;
+}
+
+vector<string> split(const string &s, char delim) {
+  vector<string> result;
+  stringstream ss(s);
+  string item;
+
+  while (getline(ss, item, delim)) {
+    result.push_back(item);
+  }
+
+  return result;
 }

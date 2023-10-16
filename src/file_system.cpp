@@ -19,6 +19,7 @@ void FileSystem::mount(char *path) {
 }
 
 void FileSystem::unmount() {
+  update_fat32();
   delete fat32;
   delete boot_sector;
   delete device;
@@ -63,6 +64,15 @@ char *FileSystem::get_file_data(int address_index) {
   }
   delete iter;
   return data;
+}
+
+int FileSystem::cd(string name) {
+  int file_address = find_file_address(name);
+  if (file_address < boot_sector->root_cluster) {
+    return -1;
+  }
+  current_directory_index = file_address;
+  return 0;
 }
 
 string FileSystem::ls() {
@@ -147,9 +157,12 @@ void FileSystem::touch(string name) {
   delete[] file_data;
 
   fat32->set_address(file_address_index, 0x0fffffff);
+
+  clear_cluster(file_address_index);
 }
 
 void FileSystem::echo(string name, string data) {
+
   int file_address = find_file_address(name);
   if (file_address == -1) {
     touch(name);

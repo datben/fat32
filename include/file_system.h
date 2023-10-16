@@ -28,6 +28,7 @@ public:
   void touch(string name);
   void echo(string name, string data);
   string cat(string name);
+  int cd(string name);
   string ls();
 
   int find_file_address(string name);

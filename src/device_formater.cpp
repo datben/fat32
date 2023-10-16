@@ -54,26 +54,14 @@ void DeviceFormater::format(FileSystem *sys, Device *device, int bytes_per_secto
   File dir = File();
   dir.name = (char *)".          ";
   dir.attributes = DIRECTORY;
-  dir.reserved = 0x0;
-  dir.creation_time = 0x0;
-  dir.creation_date = 0x0;
-  dir.last_access_date = 0x0;
   dir.first_cluster_high = 2 >> 16;
-  dir.last_write_time = 0x0;
-  dir.last_write_date = 0x0;
   dir.first_cluster_low = 2 & 0xFFFF;
   dir.file_size = 0;
 
   File parent_dir = File();
   parent_dir.name = (char *)"..         ";
   parent_dir.attributes = DIRECTORY;
-  parent_dir.reserved = 0x0;
-  parent_dir.creation_time = 0x0;
-  parent_dir.creation_date = 0x0;
-  parent_dir.last_access_date = 0x0;
   parent_dir.first_cluster_high = 0 >> 16;
-  parent_dir.last_write_time = 0x0;
-  parent_dir.last_write_date = 0x0;
   parent_dir.first_cluster_low = 0 & 0xFFFF;
   parent_dir.file_size = 0x0;
 
