@@ -126,6 +126,7 @@ int Shell::handle_stdin() {
     cout << "echo <file> '<data>' - write data to file" << endl;
     cout << "mkdir <directory> - create directory" << endl;
     cout << "touch <file> - create file" << endl;
+    cout << "format - format device" << endl;
     cout << "exit - exit shell" << endl;
     break;
   }
