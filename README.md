@@ -6,3 +6,5 @@ To compile and run :
 ```
 make run
 ```
+
+Always use `exit` to end the script
