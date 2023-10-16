@@ -1,6 +1,10 @@
 #include "../include/utils.h"
 #include <stdio.h>
 
+#include <string>
+
+using namespace std;
+
 void print_hex(char *buffer, int size, bool back_to_line) {
   for (int i = 0; i < size; i++) {
     printf("%02X ", (unsigned char)buffer[i]);
@@ -16,6 +20,21 @@ void print_char(char *buffer, int size, bool back_to_line) {
   }
   if (back_to_line) {
     printf("\n");
+  }
+}
+
+string resolve_name(string name, int len) {
+  int name_len = (int)name.length();
+  if (name_len < len) {
+    string result = name;
+    for (int i = 0; i < len - name_len; i++) {
+      result += " ";
+    }
+    return result;
+  } else if (name_len > len) {
+    return name.substr(0, len);
+  } else {
+    return name;
   }
 }
 

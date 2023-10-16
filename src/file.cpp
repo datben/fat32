@@ -5,7 +5,14 @@
 #include <iostream>
 using namespace std;
 
-File::File(){};
+File::File() {
+  reserved = 0x0;
+  creation_time = 0x0;
+  creation_date = 0x0;
+  last_access_date = 0x0;
+  last_write_time = 0x0;
+  last_write_date = 0x0;
+};
 
 File::File(char *buffer) {
   char *&buffer_viewer = buffer;

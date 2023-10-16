@@ -86,6 +86,7 @@ void DeviceFormater::format(FileSystem *sys, Device *device, int bytes_per_secto
 
   sys->write_cluster(data, 2);
 
-  delete dir_data;
-  delete parent_dir_data;
+  delete[] data;
+  delete[] dir_data;
+  delete[] parent_dir_data;
 }

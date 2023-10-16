@@ -2,6 +2,7 @@
 #define FILE_H
 
 #include "fat32.h"
+#include "file_system.h"
 #include <string>
 
 enum FileAttributes : char {

@@ -87,3 +87,12 @@ unsigned int Fat32::FileAddressIndexIterator::next() {
 }
 
 bool Fat32::FileAddressIndexIterator::has_next() { return current_address_index != 0xffffffff; }
+
+unsigned int Fat32::last_cluster(unsigned int current_address_index) {
+  Fat32::FileAddressIndexIterator iter(this, current_address_index);
+  unsigned res = -1;
+  while (iter.has_next()) {
+    res = iter.next();
+  }
+  return res;
+}

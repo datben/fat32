@@ -11,16 +11,17 @@ int main() {
   file_system->mount((char *)"./data/SSD.data");
   file_system->format(512, 4, 2, 2);
 
-  file_system->fat32->display();
+  file_system->mkdir((char *)"my_dir");
+  file_system->touch((char *)"my_file");
+
   string ls = file_system->ls();
   cout << ls << endl;
 
-  file_system->create_directory((char *)"test");
+  file_system->echo((char *)"my_file", (char *)"Hello World!");
 
-  file_system->fat32->display();
+  string cat = file_system->cat((char *)"my_file");
+  cout << cat << endl;
 
-  ls = file_system->ls();
-  cout << ls << endl;
   file_system->unmount();
   return 0;
 }

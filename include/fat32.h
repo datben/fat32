@@ -9,6 +9,7 @@ public:
   static char *format_new_fat32(int bytes_per_sector, int table_size_32);
 
   class FileAddressIndexIterator {
+
   public:
     unsigned int current_address_index;
     FileAddressIndexIterator(Fat32 *fat32, unsigned int current_address_index);
@@ -18,7 +19,7 @@ public:
 
   private:
     Fat32 *fat32;
-    };
+  };
 
   static const unsigned char ADDRESS_BYTE_SIZE = 4;
 
@@ -32,6 +33,8 @@ public:
 
   unsigned int get_address(unsigned int index);
   unsigned int get_file_cluster_size(unsigned int index);
+
+  unsigned last_cluster(unsigned int current_address_index);
 
   unsigned int get_next_free_cluster();
 

@@ -1,8 +1,14 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <string>
+
+using namespace std;
+
 void print_hex(char *buffer, int size, bool back_to_line);
 void print_char(char *buffer, int size, bool back_to_line);
+
+string resolve_name(string name, int len);
 
 char *read_bytes(char *&buffer, int size);
 char read_char(char *&buffer);
